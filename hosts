@@ -1,7 +1,7 @@
 [ubuntu]
 172.31.24.27
 
-[app server]
+[webserver]
 172.31.24.27
 
 [dbserver]
