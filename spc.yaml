@@ -8,4 +8,34 @@
         name: openjdk-11-jdk
         update_cache: yes
         state: present
+    - name: create dir for spc
+      file: 
+        path: /usr/share/springpetclinic
+        state: directory
+    - name: download spc form online
+      get_url: 
+        url: https://referenceapplicationskhaja.s3-us-west-2.amazonaws.com/spring-petclinic-2.4.2.jar
+        dest: /user/share/springpetclinic/spring-petclinic-2.4.2.jar  
+    -name: create springbootuser
+     user:
+        name: springbootuser
+        password: springbootuser
+        state: present 
+    -name: giving 500 owner rights
+     file:
+        path: /usr/share/springpetclinic/spring-petclinic-2.4.2.jar
+        owner: sringbootuser
+        mode: '500'
+        state: file
+    -name:
+     copy:
+        dest: /etc/systemd/system/springpetclinic.service
+        src: springpetclinic.service
+    - name: enable n start spc service
+     systemd:
+        name: springpetclinic.service
+        enabled: yes
+        state: started    
+
+
       
