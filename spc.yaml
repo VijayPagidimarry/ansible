@@ -1,6 +1,6 @@
 ---
  - name: deploy it as linux server
-   hosts: app server
+   hosts: webserver
    become: yes
    tasks:
     - name: update and install openjdk
