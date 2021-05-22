@@ -27,7 +27,7 @@
         owner: springbootuser1
         mode: '500'
         state: file
-    - name:
+    - name: copy spc service
       copy:
         dest: /etc/systemd/system/springpetclinic.service
         src: springpetclinic.service
