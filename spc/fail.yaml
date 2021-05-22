@@ -1,0 +1,66 @@
+---
+- name: deploy springboot clinic as linux service
+  hosts: appserver
+  become: yes  
+  tasks:
+    - name: fail the execution of yaml if the os is not ubuntu or centos
+      fail:
+         msg: "this is not ubuntu os or centos os, so execution is failed"
+      when: ansible_distribution != "Ubuntu" and ansible_facts['distribution'] != "CentOS"
+    - name: install java in ubuntu os
+      apt:
+         name: "{{ java_package }}"
+         update_cache: yes
+         state: present 
+      notify:
+        - install msg for java
+      when: ansible_facts['distribution'] == "Ubuntu"
+    - name: install java in CentOS
+      yum:
+        name: "{{ java_package }}"
+        state: present
+      notify:
+        - install msg for java
+      when: ansible_facts['distribution'] == "CentOS"
+    - name: create directory for springpetclinic
+      file:
+         path: "{{ app_dir }}"
+         state: directory 
+      notify:
+        - debug msg for dir creation
+    - name: download springpetclinic
+      get_url:
+         url: "{{ app_download_url }}"
+         dest: "{{ app_file_name }}"
+    - name: creating spc user
+      user: 
+         name: "{{ app_username }}"
+         password: "{{ app_username }}"
+         state: present
+      notify:
+        - change ownership of jar file
+    - name: copying springpetclinic file service to the node
+      copy:
+         dest: /etc/systemd/system/springpetclinic.service
+         src: springpetclinic.service
+    - name: enabling and starting spc service in node
+      systemd:
+         name: springpetclinic.service
+         enabled: yes
+         state: started
+  handlers:
+    - name: install msg for java
+      debug:
+         msg: " software package {{ java_package }} is installed "
+
+    - name: debug msg for dir creation
+      debug:
+         msg: " directory is created at {{ app_dir }} "
+
+    - name: change ownership of jar file
+      file: 
+         path: "{{ app_file_name }}"
+         owner: "{{ app_username }}"
+         mode: '500'
+         state: file
+    

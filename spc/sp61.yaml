@@ -1,0 +1,51 @@
+---
+- name: deploy springboot clinic as linux service
+  hosts: appserver
+  become: yes
+  vars: 
+    java_package: openjdk-11-jdk
+    app_dir: /usr/share/springpetclinic
+    app_download_url: https://referenceapplicationskhaja.s3-us-west-2.amazonaws.com/spring-petclinic-2.4.2.jar
+    app_file_name: /usr/share/springpetclinic/spring-petclinic-2.4.2.jar
+    app_username: springbootuser
+    test_var: just for testing
+  tasks:
+   - name: display java package
+     debug: 
+        var: java_package
+   - name: checking variable topic
+     debug:
+        var: test_var 
+   - name: update ubuntu n install java
+     apt:
+        name: "{{ java_package }}"
+        update_cache: yes
+        state: present 
+   - name: create directory for springpetclinic
+     file:
+        path: "{{ app_dir }}"
+        state: directory 
+   - name: download springpetclinic
+     get_url:
+        url: "{{ app_download_url }}"
+        dest: "{{ app_file_name }}"
+   - name: creating spc user
+     user: 
+        name: "{{ app_username }}"
+        password: "{{ app_username }}"
+        state: present
+   - name: change ownership of jar file
+     file: 
+        path: "{{ app_file_name }}"
+        owner: "{{ app_username }}"
+        mode: '500'
+        state: file
+   - name: copying springpetclinic file service to the node
+     copy:
+        dest: /etc/systemd/system/springpetclinic.service
+        src: springpetclinic.service
+   - name: enabling and starting spc service in node
+     systemd:
+        name: springpetclinic.service
+        enabled: yes
+        state: started
