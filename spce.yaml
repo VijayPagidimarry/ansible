@@ -29,11 +29,11 @@
         state: file
     - name:
       copy:
-        dest: /etc/systemd/system/springpetlinic.service
-        src: springpetlinic.service
+        dest: /etc/systemd/system/springpetclinic.service
+        src: springpetclinic.service
     - name: enable n start spc service
       systemd:
-        name: springpetlinic.service
+        name: springpetclinic.service
         enabled: yes
         state: started    
 
