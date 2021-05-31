@@ -1,12 +1,13 @@
 [Ubuntu]
 172.31.24.27
-localhost
+
 
 [CentOS]
 172.31.24.27
 
 [appserver]
 172.31.24.27
+
 
 [dbserver]
 172.31.24.27
