@@ -1,0 +1,39 @@
+---
+- name: deploy springboot spc as linux service
+  hosts: appserver
+  become: yes
+  tasks:
+    -  name: update ubuntu n install java
+       apt:
+         name: openjdk-11-jdk
+         update_cache: yes
+         state: present 
+    -  name: create directory for springpetclinic
+       file:
+         path: /usr/share/springpetclinic
+         state: directory 
+    -  name: download springpetclinic
+       get_url:
+         url: https://referenceapplicationskhaja.s3-us-west-2.amazonaws.com/spring-petclinic-2.4.2.jar
+         dest: /usr/share/springpetclinic/spring-petclinic-2.4.2.jar
+    -  name: creating spc user
+       user: 
+         name: springbootuser1
+         password: springbootuser1
+         state: present
+    - name: change ownership of jar file
+      file: 
+         path: /usr/share/springpetclinic/spring-petclinic-2.4.2.jar
+         owner: springbootuser1
+         mode: '500'
+         state: file
+    - name: copying springpetclinic file service to the node
+      copy:
+         dest: /etc/systemd/system/springpetclinic.service
+         src: springpetclinic.service
+    - name: enabling and starting spc service in node
+      systemd:
+         name: springpetclinic.service
+         enabled: yes
+         state: started
+      
