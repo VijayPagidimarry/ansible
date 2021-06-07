@@ -1,0 +1,43 @@
+---
+- name: deploy apache in ubuntu
+  hosts: lampserver
+  become: yes  
+  tasks:
+    - name: fail the execution of yaml if the os is not ubuntu or centos
+      fail:
+         msg: "this is not ubuntu os or centos os, so execution is failed"
+      when: ansible_distribution != "Ubuntu" and ansible_facts['distribution'] != "CentOS"
+    - name: install apache2 
+      package:
+         name: "{{ apache_package }}"
+         state: present
+      notify:
+         - log installed apache server
+         - restarting apache
+    - name: install php packages
+      package:
+         name: "{{ item }}"
+         state: present
+      loop: "{{ php_packages }}"
+    - name: copy the info page
+      copy:
+         dest: "{{ info_page_path }}"
+         src: "info.php"
+      notify: 
+         - log info page is copied
+    - name: ensure the service is running
+      service:
+         name: "{{ apache_package }}"
+         enabled: yes
+         state: started
+  handlers:
+    - name: log installed apache server
+      debug:
+         msg: " software package {{ apache_package }} is installed "
+    - name: log info page is copied
+      debug:
+         msg: " info page is copied into {{ info_page_path }}"
+    - name : restarting apache
+      service:
+        name: "{{ apache_package }}"
+        state: restarted
