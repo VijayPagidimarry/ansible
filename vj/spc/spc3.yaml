@@ -3,7 +3,7 @@
   hosts: appserver
   become: yes  
   tasks:
-    - name: update ubuntu n install javaa
+    - name: update ubuntu n install java
       apt:
          name: "{{ java_package }}"
          update_cache: yes
